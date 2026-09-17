@@ -1,0 +1,19 @@
+{
+	"node": "n8n-nodes-bulktranscripts.bulkTranscripts",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Marketing", "Data & Storage", "AI"],
+	"alias": ["youtube", "transcript", "captions", "subtitles", "video", "playlist", "channel"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/pratie/n8n-nodes-bulktranscripts#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://bulktranscripts.co/docs"
+			}
+		]
+	}
+}

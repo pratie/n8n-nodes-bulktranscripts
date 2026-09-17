@@ -1,0 +1,43 @@
+{
+  "name": "YouTube: transcribe new uploads (BulkTranscripts)",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] } },
+      "id": "b1f0c9a0-0001-4000-8000-000000000001",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": { "resource": "channel", "operation": "getLatest", "channel": "@veritasium", "splitIntoItems": true },
+      "id": "b1f0c9a0-0002-4000-8000-000000000002",
+      "name": "Latest uploads (free)",
+      "type": "n8n-nodes-bulktranscripts.bulkTranscripts",
+      "typeVersion": 1,
+      "position": [220, 0]
+    },
+    {
+      "parameters": { "operation": "removeItemsSeenInPreviousExecutions", "dedupeValue": "={{ $json.id }}", "options": {} },
+      "id": "b1f0c9a0-0003-4000-8000-000000000003",
+      "name": "Only new videos",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": { "resource": "transcript", "operation": "get", "video": "={{ $json.id }}", "includeSegments": false, "options": {} },
+      "id": "b1f0c9a0-0004-4000-8000-000000000004",
+      "name": "Get transcript",
+      "type": "n8n-nodes-bulktranscripts.bulkTranscripts",
+      "typeVersion": 1,
+      "position": [660, 0]
+    }
+  ],
+  "connections": {
+    "Every hour": { "main": [[{ "node": "Latest uploads (free)", "type": "main", "index": 0 }]] },
+    "Latest uploads (free)": { "main": [[{ "node": "Only new videos", "type": "main", "index": 0 }]] },
+    "Only new videos": { "main": [[{ "node": "Get transcript", "type": "main", "index": 0 }]] }
+  },
+  "settings": {}
+}
