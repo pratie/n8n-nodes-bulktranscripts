@@ -53,6 +53,10 @@ transcript only for the new ones. Import it via **Workflows → Import from file
 credential on both BulkTranscripts nodes, and connect whatever comes next: an AI summary, Slack,
 Notion, a database.
 
+[`examples/playlist-to-transcripts.json`](examples/playlist-to-transcripts.json) lists a playlist
+in order and fetches every transcript, continuing past videos that have no captions (those are
+never charged). Useful for turning a course or lecture series into notes or a knowledge base.
+
 More recipes: [YouTube transcripts in n8n](https://bulktranscripts.co/integrations/n8n-youtube-transcripts)
 and the [workflow library](https://bulktranscripts.co/workflows).
 

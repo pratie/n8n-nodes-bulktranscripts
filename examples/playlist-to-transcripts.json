@@ -1,0 +1,35 @@
+{
+  "name": "YouTube: playlist to transcripts (BulkTranscripts)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c2f0c9a0-0001-4000-8000-000000000001",
+      "name": "Run manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": { "resource": "playlist", "operation": "listVideos", "playlist": "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID", "limit": 50, "splitIntoItems": true },
+      "id": "c2f0c9a0-0002-4000-8000-000000000002",
+      "name": "List playlist videos",
+      "type": "n8n-nodes-bulktranscripts.bulkTranscripts",
+      "typeVersion": 1,
+      "position": [220, 0]
+    },
+    {
+      "parameters": { "resource": "transcript", "operation": "get", "video": "={{ $json.id }}", "includeSegments": false, "options": {} },
+      "id": "c2f0c9a0-0003-4000-8000-000000000003",
+      "name": "Get transcript",
+      "type": "n8n-nodes-bulktranscripts.bulkTranscripts",
+      "typeVersion": 1,
+      "position": [440, 0],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Run manually": { "main": [[{ "node": "List playlist videos", "type": "main", "index": 0 }]] },
+    "List playlist videos": { "main": [[{ "node": "Get transcript", "type": "main", "index": 0 }]] }
+  },
+  "settings": {}
+}
