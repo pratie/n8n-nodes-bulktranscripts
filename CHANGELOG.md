@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- New icon: the current BulkTranscripts brand mark (red transcript page with a play button),
+  replacing the old BT speech-bubble mark.
+
 ## 0.1.1
 
 - First release published from GitHub Actions with npm provenance.
