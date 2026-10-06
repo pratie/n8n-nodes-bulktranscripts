@@ -2,7 +2,7 @@
 	"node": "n8n-nodes-bulktranscripts.bulkTranscripts",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Marketing", "Data & Storage", "AI"],
+	"categories": ["Marketing & Content", "Data & Storage"],
 	"alias": ["youtube", "transcript", "captions", "subtitles", "video", "playlist", "channel"],
 	"resources": {
 		"credentialDocumentation": [

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Codex categories use the supported community-node values: "Marketing & Content" and
+  "Data & Storage" (dropped "Marketing" and "AI"), per n8n verification review.
+
 ## 0.1.2
 
 - New icon: the current BulkTranscripts brand mark (red transcript page with a play button),
