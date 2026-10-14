@@ -1,5 +1,6 @@
 import {
 	NodeConnectionTypes,
+	type IDataObject,
 	type INodeProperties,
 	type INodeType,
 	type INodeTypeDescription,
@@ -48,7 +49,9 @@ const returnAll = (resource: string, operation: string[], pageSize: number): INo
 					// n8n replaces qs wholesale and evaluates this before the first
 					// request too: keep the original query, add start once known.
 					request: {
-						qs: '={{ Object.assign({}, $request.qs, $response.body && $response.body.next_start ? { start: $response.body.next_start } : {}) }}',
+						// An expression is evaluated to an object at run time; the type
+						// only describes literal objects.
+						qs: '={{ Object.assign({}, $request.qs, $response.body && $response.body.next_start ? { start: $response.body.next_start } : {}) }}' as unknown as IDataObject,
 					},
 				},
 			},
