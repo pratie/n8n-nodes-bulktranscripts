@@ -26,6 +26,36 @@ const splitIntoItems = (resource: string, operation: string[]): INodeProperties 
 	},
 });
 
+const returnAll = (resource: string, operation: string[], pageSize: number): INodeProperties => ({
+	displayName: 'Return All',
+	name: 'returnAll',
+	type: 'boolean',
+	default: false,
+	description: 'Whether to return all results or only up to a given limit',
+	displayOptions: { show: { resource: [resource], operation } },
+	routing: {
+		send: {
+			paginate: '={{ $value }}',
+			type: 'query',
+			property: 'limit',
+			value: '={{ $value ? ' + pageSize + ' : undefined }}',
+		},
+		operations: {
+			pagination: {
+				type: 'generic',
+				properties: {
+					continue: '={{ !!$response.body.next_start }}',
+					// n8n replaces qs wholesale and evaluates this before the first
+					// request too: keep the original query, add start once known.
+					request: {
+						qs: '={{ Object.assign({}, $request.qs, $response.body && $response.body.next_start ? { start: $response.body.next_start } : {}) }}',
+					},
+				},
+			},
+		},
+	},
+});
+
 const channelField = (operation: string[]): INodeProperties => ({
 	displayName: 'Channel',
 	name: 'channel',
@@ -173,14 +203,14 @@ export class BulkTranscripts implements INodeType {
 						name: 'List Videos',
 						value: 'listVideos',
 						action: 'List the videos of a channel',
-						description: 'List up to 1,000 videos of a channel. Costs 1 credit.',
+						description: 'List the videos of a channel, newest first. Costs 1 credit per page of up to 1,000.',
 						routing: { request: { method: 'GET', url: '/channel/videos' } },
 					},
 					{
 						name: 'Search',
 						value: 'search',
 						action: 'Search inside a channel',
-						description: 'Find videos about a topic within one channel. Costs 1 credit.',
+						description: 'Find videos about a topic within one channel. Costs 1 credit per page of up to 50.',
 						routing: { request: { method: 'GET', url: '/channel/search' } },
 					},
 				],
@@ -197,6 +227,7 @@ export class BulkTranscripts implements INodeType {
 				displayOptions: { show: { resource: ['channel'], operation: ['search'] } },
 				routing: { send: { type: 'query', property: 'q' } },
 			},
+			returnAll('channel', ['listVideos'], 1000),
 			{
 				displayName: 'Limit',
 				name: 'limit',
@@ -204,9 +235,10 @@ export class BulkTranscripts implements INodeType {
 				typeOptions: { minValue: 1, maxValue: 1000 },
 				default: 50,
 				description: 'Max number of results to return',
-				displayOptions: { show: { resource: ['channel'], operation: ['listVideos'] } },
+				displayOptions: { show: { resource: ['channel'], operation: ['listVideos'], returnAll: [false] } },
 				routing: { send: { type: 'query', property: 'limit' } },
 			},
+			returnAll('channel', ['search'], 50),
 			{
 				displayName: 'Limit',
 				name: 'limit',
@@ -214,7 +246,7 @@ export class BulkTranscripts implements INodeType {
 				typeOptions: { minValue: 1, maxValue: 50 },
 				default: 50,
 				description: 'Max number of results to return',
-				displayOptions: { show: { resource: ['channel'], operation: ['search'] } },
+				displayOptions: { show: { resource: ['channel'], operation: ['search'], returnAll: [false] } },
 				routing: { send: { type: 'query', property: 'limit' } },
 			},
 			splitIntoItems('channel', ['getLatest', 'listVideos', 'search']),
@@ -231,7 +263,7 @@ export class BulkTranscripts implements INodeType {
 						name: 'List Videos',
 						value: 'listVideos',
 						action: 'List the videos of a playlist',
-						description: 'List a playlist in order, up to 1,000 videos. Costs 1 credit.',
+						description: 'List a playlist in order. Costs 1 credit per page of up to 1,000.',
 						routing: { request: { method: 'GET', url: '/playlist/videos' } },
 					},
 				],
@@ -248,6 +280,7 @@ export class BulkTranscripts implements INodeType {
 				displayOptions: { show: { resource: ['playlist'], operation: ['listVideos'] } },
 				routing: { send: { type: 'query', property: 'playlist' } },
 			},
+			returnAll('playlist', ['listVideos'], 1000),
 			{
 				displayName: 'Limit',
 				name: 'limit',
@@ -255,7 +288,7 @@ export class BulkTranscripts implements INodeType {
 				typeOptions: { minValue: 1, maxValue: 1000 },
 				default: 50,
 				description: 'Max number of results to return',
-				displayOptions: { show: { resource: ['playlist'], operation: ['listVideos'] } },
+				displayOptions: { show: { resource: ['playlist'], operation: ['listVideos'], returnAll: [false] } },
 				routing: { send: { type: 'query', property: 'limit' } },
 			},
 			splitIntoItems('playlist', ['listVideos']),
@@ -272,7 +305,7 @@ export class BulkTranscripts implements INodeType {
 						name: 'Search YouTube',
 						value: 'searchYoutube',
 						action: 'Search for videos channels or playlists',
-						description: 'Search YouTube for videos, channels or playlists. Costs 1 credit.',
+						description: 'Search YouTube for videos, channels or playlists. Costs 1 credit per page of up to 50.',
 						routing: { request: { method: 'GET', url: '/search' } },
 					},
 				],
@@ -301,6 +334,7 @@ export class BulkTranscripts implements INodeType {
 				displayOptions: { show: { resource: ['search'], operation: ['searchYoutube'] } },
 				routing: { send: { type: 'query', property: 'type' } },
 			},
+			returnAll('search', ['searchYoutube'], 50),
 			{
 				displayName: 'Limit',
 				name: 'limit',
@@ -308,7 +342,7 @@ export class BulkTranscripts implements INodeType {
 				typeOptions: { minValue: 1, maxValue: 50 },
 				default: 50,
 				description: 'Max number of results to return',
-				displayOptions: { show: { resource: ['search'], operation: ['searchYoutube'] } },
+				displayOptions: { show: { resource: ['search'], operation: ['searchYoutube'], returnAll: [false] } },
 				routing: { send: { type: 'query', property: 'limit' } },
 			},
 			splitIntoItems('search', ['searchYoutube']),
